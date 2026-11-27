@@ -41,33 +41,6 @@ async function getBounties(): Promise<BountyCardData[]> {
   }
 }
 
-const steps = [
-  {
-    number: '01',
-    icon: BriefcaseBusiness,
-    title: 'Find work worth doing',
-    description: 'Explore open tasks, understand the requirements, and choose a bounty that matches your skills.',
-  },
-  {
-    number: '02',
-    icon: LockKeyhole,
-    title: 'Reward gets locked',
-    description: 'The creator funds the bounty into Solana escrow before contributors start working.',
-  },
-  {
-    number: '03',
-    icon: BadgeCheck,
-    title: 'Submit and get selected',
-    description: 'Send your work for review. The creator selects one winning submission under the bounty rules.',
-  },
-  {
-    number: '04',
-    icon: CircleDollarSign,
-    title: 'Get paid on-chain',
-    description: 'When a submission is accepted, the smart contract releases the reward to the winner.',
-  },
-];
-
 const principles = [
   {
     icon: ShieldCheck,
