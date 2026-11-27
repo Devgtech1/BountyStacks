@@ -75,6 +75,9 @@ jobs:
       - name: Check Rust formatting
         run: cargo fmt --all -- --check
 
+      - name: Install compatible Solana platform tools
+        run: cargo build-sbf --tools-version v1.58 --install-only
+
       - name: Build Anchor program and generate IDL
         run: anchor build
 
