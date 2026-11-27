@@ -1,0 +1,178 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum BountyCategory {
+  CODING
+  DESIGN
+  DOCS
+  BUG_FIX
+}
+
+enum BountyStatus {
+  OPEN
+  COMPLETED
+  REFUNDED
+  CANCELLED
+}
+
+enum SubmissionStatus {
+  SUBMITTED
+  ACCEPTED
+  REJECTED
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  BANNED
+}
+
+enum DisputeStatus {
+  OPEN
+  UNDER_REVIEW
+  RESOLVED_FOR_CONTRIBUTOR
+  RESOLVED_FOR_CREATOR
+  DISMISSED
+}
+
+enum ReportStatus {
+  OPEN
+  REVIEWING
+  ACTIONED
+  DISMISSED
+}
+
+model User {
+  walletAddress  String       @id
+  displayName    String?
+  createdAt      DateTime     @default(now())
+  status         UserStatus   @default(ACTIVE)
+  moderationReason String?    @db.Text
+  moderatedAt    DateTime?
+  createdBounties Bounty[]    @relation("CreatorBounties")
+  submissions    Submission[]
+}
+
+model Bounty {
+  id                 String           @id
+  onChainTaskId      String
+  creatorWallet      String
+  creator            User             @relation("CreatorBounties", fields: [creatorWallet], references: [walletAddress])
+  title              String
+  summary            String
+  description        String           @db.Text
+  category           BountyCategory
+  acceptanceCriteria Json
+  requirementsHash   String
+  rewardLamports     BigInt
+  deadline           DateTime
+  status             BountyStatus     @default(OPEN)
+  submissionCount    Int              @default(0)
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+  reviewDeadline      DateTime?
+  submissions        Submission[]
+  completion         Completion?
+  disputes            Dispute[]
+  reports             Report[]
+
+  @@index([status, category, createdAt])
+  @@index([creatorWallet, status])
+}
+
+model Submission {
+  id                String           @id @default(cuid())
+  bountyId          String
+  bounty            Bounty           @relation(fields: [bountyId], references: [id], onDelete: Cascade)
+  contributorWallet String
+  contributor       User             @relation(fields: [contributorWallet], references: [walletAddress])
+  contentCiphertext String           @db.Text
+  contentNonce      String
+  contentHash       String
+  status            SubmissionStatus @default(SUBMITTED)
+  reviewerNote      String?          @db.Text
+  submittedAt       DateTime         @default(now())
+  reviewedAt        DateTime?
+  reports           Report[]
+
+  @@unique([bountyId, contributorWallet])
+  @@index([contributorWallet, submittedAt])
+}
+
+model Completion {
+  bountyId          String   @id
+  bounty            Bounty   @relation(fields: [bountyId], references: [id])
+  winnerWallet      String
+  rewardLamports    BigInt
+  signature         String
+  completedAt       DateTime
+  requirementsHash  String
+}
+
+model WalletNonce {
+  walletAddress String   @id
+  nonce         String
+  expiresAt     DateTime
+}
+
+
+model Dispute {
+  id                String        @id @default(cuid())
+  bountyId          String
+  bounty            Bounty        @relation(fields: [bountyId], references: [id], onDelete: Cascade)
+  openedByWallet    String
+  againstWallet     String
+  reason            String        @db.Text
+  evidence          String?       @db.Text
+  status            DisputeStatus @default(OPEN)
+  resolution        String?       @db.Text
+  resolvedByWallet  String?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  resolvedAt        DateTime?
+
+  @@index([status, createdAt])
+  @@index([bountyId])
+}
+
+model Report {
+  id                String       @id @default(cuid())
+  reporterWallet    String
+  targetWallet      String?
+  bountyId          String?
+  bounty            Bounty?      @relation(fields: [bountyId], references: [id], onDelete: SetNull)
+  submissionId      String?
+  submission        Submission? @relation(fields: [submissionId], references: [id], onDelete: SetNull)
+  reason            String       @db.Text
+  status            ReportStatus @default(OPEN)
+  adminNote         String?      @db.Text
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+
+  @@index([status, createdAt])
+}
+
+model AuditLog {
+  id             String   @id @default(cuid())
+  actorWallet    String
+  action         String
+  targetType     String
+  targetId       String
+  details        Json?
+  createdAt      DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([actorWallet, createdAt])
+}
+
+model PlatformSetting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+}

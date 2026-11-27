@@ -1,0 +1,3 @@
+import { NextResponse } from 'next/server';
+import { db } from '@/lib/db/prisma';
+export async function GET(_req:Request,{params}:{params:Promise<{id:string}>}){const {id}=await params;const record=await db.completion.findUnique({where:{bountyId:id},include:{bounty:{select:{title:true,creatorWallet:true}}}}).catch(()=>null);if(!record)return NextResponse.json({error:'No completion record found for this bounty.'},{status:404});return NextResponse.json({verified:true,bountyId:id,title:record.bounty.title,creator:record.bounty.creatorWallet,winner:record.winnerWallet,rewardLamports:record.rewardLamports.toString(),signature:record.signature,completedAt:record.completedAt.toISOString(),requirementsHash:record.requirementsHash});}
