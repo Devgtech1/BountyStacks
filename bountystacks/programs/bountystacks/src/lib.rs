@@ -18,7 +18,10 @@ pub mod bountystacks {
     ) -> Result<()> {
         let now = Clock::get()?.unix_timestamp;
         require!(deadline > now, BountyError::DeadlineMustBeFuture);
-        require!(reward_lamports >= MIN_REWARD_LAMPORTS, BountyError::RewardBelowMinimum);
+        require!(
+            reward_lamports >= MIN_REWARD_LAMPORTS,
+            BountyError::RewardBelowMinimum
+        );
 
         let cpi_accounts = Transfer {
             from: ctx.accounts.creator.to_account_info(),
@@ -43,9 +46,18 @@ pub mod bountystacks {
 
     pub fn submit_solution(ctx: Context<SubmitSolution>, solution_hash: [u8; 32]) -> Result<()> {
         let now = Clock::get()?.unix_timestamp;
-        require!(ctx.accounts.task.status == TaskStatus::Open, BountyError::TaskNotOpen);
-        require!(now <= ctx.accounts.task.deadline, BountyError::SubmissionDeadlinePassed);
-        require!(ctx.accounts.submitter.key() != ctx.accounts.task.creator, BountyError::CreatorCannotSubmit);
+        require!(
+            ctx.accounts.task.status == TaskStatus::Open,
+            BountyError::TaskNotOpen
+        );
+        require!(
+            now <= ctx.accounts.task.deadline,
+            BountyError::SubmissionDeadlinePassed
+        );
+        require!(
+            ctx.accounts.submitter.key() != ctx.accounts.task.creator,
+            BountyError::CreatorCannotSubmit
+        );
 
         let submission = &mut ctx.accounts.submission;
         submission.task = ctx.accounts.task.key();
@@ -53,29 +65,49 @@ pub mod bountystacks {
         submission.solution_hash = solution_hash;
         submission.submitted_at = now;
         submission.bump = ctx.bumps.submission;
-        ctx.accounts.task.submission_count = ctx.accounts.task.submission_count
-            .checked_add(1).ok_or(BountyError::ArithmeticOverflow)?;
+        ctx.accounts.task.submission_count = ctx
+            .accounts
+            .task
+            .submission_count
+            .checked_add(1)
+            .ok_or(BountyError::ArithmeticOverflow)?;
         Ok(())
     }
 
     pub fn accept_submission(ctx: Context<AcceptSubmission>) -> Result<()> {
         let now = Clock::get()?.unix_timestamp;
         let task = &mut ctx.accounts.task;
-        require!(task.creator == ctx.accounts.creator.key(), BountyError::Unauthorized);
+        require!(
+            task.creator == ctx.accounts.creator.key(),
+            BountyError::Unauthorized
+        );
         require!(task.status == TaskStatus::Open, BountyError::TaskNotOpen);
-        require!(ctx.accounts.submission.task == task.key(), BountyError::SubmissionTaskMismatch);
-        require!(ctx.accounts.submission.submitter == ctx.accounts.winner.key(), BountyError::WinnerMismatch);
+        require!(
+            ctx.accounts.submission.task == task.key(),
+            BountyError::SubmissionTaskMismatch
+        );
+        require!(
+            ctx.accounts.submission.submitter == ctx.accounts.winner.key(),
+            BountyError::WinnerMismatch
+        );
         require!(task.submission_count > 0, BountyError::NoSubmissions);
 
         let reward = task.reward_lamports;
         let task_info = task.to_account_info();
         let winner_info = ctx.accounts.winner.to_account_info();
         let rent_reserve = Rent::get()?.minimum_balance(task_info.data_len());
-        require!(task_info.lamports().saturating_sub(reward) >= rent_reserve, BountyError::EscrowInsufficient);
+        require!(
+            task_info.lamports().saturating_sub(reward) >= rent_reserve,
+            BountyError::EscrowInsufficient
+        );
         let task_balance = task_info.lamports();
         let winner_balance = winner_info.lamports();
-        **task_info.try_borrow_mut_lamports()? = task_balance.checked_sub(reward).ok_or(BountyError::ArithmeticOverflow)?;
-        **winner_info.try_borrow_mut_lamports()? = winner_balance.checked_add(reward).ok_or(BountyError::ArithmeticOverflow)?;
+        **task_info.try_borrow_mut_lamports()? = task_balance
+            .checked_sub(reward)
+            .ok_or(BountyError::ArithmeticOverflow)?;
+        **winner_info.try_borrow_mut_lamports()? = winner_balance
+            .checked_add(reward)
+            .ok_or(BountyError::ArithmeticOverflow)?;
 
         task.status = TaskStatus::Completed;
         let record = &mut ctx.accounts.completion;
@@ -102,11 +134,18 @@ pub mod bountystacks {
         let task_info = task.to_account_info();
         let creator_info = ctx.accounts.creator.to_account_info();
         let rent_reserve = Rent::get()?.minimum_balance(task_info.data_len());
-        require!(task_info.lamports().saturating_sub(refund) >= rent_reserve, BountyError::EscrowInsufficient);
+        require!(
+            task_info.lamports().saturating_sub(refund) >= rent_reserve,
+            BountyError::EscrowInsufficient
+        );
         let task_balance = task_info.lamports();
         let creator_balance = creator_info.lamports();
-        **task_info.try_borrow_mut_lamports()? = task_balance.checked_sub(refund).ok_or(BountyError::ArithmeticOverflow)?;
-        **creator_info.try_borrow_mut_lamports()? = creator_balance.checked_add(refund).ok_or(BountyError::ArithmeticOverflow)?;
+        **task_info.try_borrow_mut_lamports()? = task_balance
+            .checked_sub(refund)
+            .ok_or(BountyError::ArithmeticOverflow)?;
+        **creator_info.try_borrow_mut_lamports()? = creator_balance
+            .checked_add(refund)
+            .ok_or(BountyError::ArithmeticOverflow)?;
         task.status = TaskStatus::Refunded;
         Ok(())
     }
@@ -216,21 +255,38 @@ pub struct CompletionRecord {
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, PartialEq, Eq, InitSpace)]
-pub enum TaskStatus { Open, Completed, Refunded }
+pub enum TaskStatus {
+    Open,
+    Completed,
+    Refunded,
+}
 
 #[error_code]
 pub enum BountyError {
-    #[msg("The deadline must be in the future.")] DeadlineMustBeFuture,
-    #[msg("The reward is below the configured minimum.")] RewardBelowMinimum,
-    #[msg("This task is not open.")] TaskNotOpen,
-    #[msg("The submission deadline has passed.")] SubmissionDeadlinePassed,
-    #[msg("The task creator cannot submit to their own task.")] CreatorCannotSubmit,
-    #[msg("Only the task creator may perform this action.")] Unauthorized,
-    #[msg("The submission does not belong to this task.")] SubmissionTaskMismatch,
-    #[msg("The selected winner does not match the submission.")] WinnerMismatch,
-    #[msg("There are no submissions for this task.")] NoSubmissions,
-    #[msg("The task deadline has not passed.")] DeadlineNotPassed,
-    #[msg("Contributors have submitted work; escrow cannot be refunded through the expiry path.")] SubmissionsExist,
-    #[msg("Escrow does not contain the expected reward and rent reserve.")] EscrowInsufficient,
-    #[msg("Arithmetic overflow.")] ArithmeticOverflow,
+    #[msg("The deadline must be in the future.")] 
+    DeadlineMustBeFuture,
+    #[msg("The reward is below the configured minimum.")] 
+    RewardBelowMinimum,
+    #[msg("This task is not open.")] 
+    TaskNotOpen,
+    #[msg("The submission deadline has passed.")] 
+    SubmissionDeadlinePassed,
+    #[msg("The task creator cannot submit to their own task.")] 
+    CreatorCannotSubmit,
+    #[msg("Only the task creator may perform this action.")] 
+    Unauthorized,
+    #[msg("The submission does not belong to this task.")] 
+    SubmissionTaskMismatch,
+    #[msg("The selected winner does not match the submission.")] 
+    WinnerMismatch,
+    #[msg("There are no submissions for this task.")] 
+    NoSubmissions,
+    #[msg("The task deadline has not passed.")] 
+    DeadlineNotPassed,
+    #[msg("Contributors have submitted work; escrow cannot be refunded through the expiry path.")] 
+    SubmissionsExist,
+    #[msg("Escrow does not contain the expected reward and rent reserve.")] 
+    EscrowInsufficient,
+    #[msg("Arithmetic overflow.")] 
+    ArithmeticOverflow,
 }
