@@ -263,30 +263,30 @@ pub enum TaskStatus {
 
 #[error_code]
 pub enum BountyError {
-    #[msg("The deadline must be in the future.")] 
+    #[msg("The deadline must be in the future.")]
     DeadlineMustBeFuture,
-    #[msg("The reward is below the configured minimum.")] 
+    #[msg("The reward is below the configured minimum.")]
     RewardBelowMinimum,
-    #[msg("This task is not open.")] 
+    #[msg("This task is not open.")]
     TaskNotOpen,
-    #[msg("The submission deadline has passed.")] 
+    #[msg("The submission deadline has passed.")]
     SubmissionDeadlinePassed,
-    #[msg("The task creator cannot submit to their own task.")] 
+    #[msg("The task creator cannot submit to their own task.")]
     CreatorCannotSubmit,
-    #[msg("Only the task creator may perform this action.")] 
+    #[msg("Only the task creator may perform this action.")]
     Unauthorized,
-    #[msg("The submission does not belong to this task.")] 
+    #[msg("The submission does not belong to this task.")]
     SubmissionTaskMismatch,
-    #[msg("The selected winner does not match the submission.")] 
+    #[msg("The selected winner does not match the submission.")]
     WinnerMismatch,
-    #[msg("There are no submissions for this task.")] 
+    #[msg("There are no submissions for this task.")]
     NoSubmissions,
-    #[msg("The task deadline has not passed.")] 
+    #[msg("The task deadline has not passed.")]
     DeadlineNotPassed,
-    #[msg("Contributors have submitted work; escrow cannot be refunded through the expiry path.")] 
+    #[msg("Contributors have submitted work; escrow cannot be refunded through the expiry path.")]
     SubmissionsExist,
-    #[msg("Escrow does not contain the expected reward and rent reserve.")] 
+    #[msg("Escrow does not contain the expected reward and rent reserve.")]
     EscrowInsufficient,
-    #[msg("Arithmetic overflow.")] 
+    #[msg("Arithmetic overflow.")]
     ArithmeticOverflow,
 }
