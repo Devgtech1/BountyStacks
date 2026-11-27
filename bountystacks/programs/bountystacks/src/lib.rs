@@ -124,7 +124,10 @@ pub mod bountystacks {
     pub fn refund_expired_task(ctx: Context<RefundExpiredTask>) -> Result<()> {
         let now = Clock::get()?.unix_timestamp;
         let task = &mut ctx.accounts.task;
-        require!(task.creator == ctx.accounts.creator.key(), BountyError::Unauthorized);
+        require!(
+            task.creator == ctx.accounts.creator.key(),
+            BountyError::Unauthorized
+        );
         require!(task.status == TaskStatus::Open, BountyError::TaskNotOpen);
         require!(now > task.deadline, BountyError::DeadlineNotPassed);
         // Never allow a creator to reclaim funds after contributors have submitted work.
