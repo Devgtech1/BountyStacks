@@ -41,7 +41,7 @@ jobs:
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
-          toolchain: 1.86.0
+          toolchain: 1.88.0
           components: rustfmt, clippy
 
       - name: Cache Rust dependencies
@@ -51,7 +51,7 @@ jobs:
 
       - name: Install Solana CLI
         run: |
-          sh -c "$(curl -sSfL https://release.anza.xyz/v2.1.0/install)"
+          sh -c "$(curl -sSfL https://release.anza.xyz/v2.3.0/install)"
           echo "$HOME/.local/share/solana/install/active_release/bin" >> "$GITHUB_PATH"
 
       - name: Install Anchor Version Manager
@@ -67,11 +67,16 @@ jobs:
           cache: npm
           cache-dependency-path: bountystacks/package-lock.json
 
-      - name: Install JavaScript dependencies
-        run: npm ci
+      - name: Sync lockfile and install JavaScript dependencies
+        run: |
+          npm install --package-lock-only --ignore-scripts --no-audit --no-fund
+          npm ci
 
       - name: Check Rust formatting
         run: cargo fmt --all -- --check
+
+      - name: Install compatible Solana platform tools
+        run: cargo build-sbf --tools-version v1.58 --install-only
 
       - name: Build Anchor program and generate IDL
         run: anchor build
