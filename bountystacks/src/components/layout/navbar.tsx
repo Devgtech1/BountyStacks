@@ -1,4 +1,71 @@
+'use client';
+
 import Link from 'next/link';
+import { useState } from 'react';
+import { Menu, X } from 'lucide-react';
 import { ThemeToggle } from './theme-toggle';
 import { ConnectButton } from '../wallet/connect-button';
-export function Navbar(){return <header style={{borderBottom:'1px solid var(--line)',background:'color-mix(in srgb,var(--bg) 88%,transparent)',backdropFilter:'blur(12px)'}}><div className="shell" style={{height:72,display:'flex',alignItems:'center',gap:28}}><Link href="/" style={{display:'flex',alignItems:'center',gap:9,fontWeight:800,fontSize:18,textDecoration:'none',color:'var(--text)'}}><span style={{width:28,height:28,borderRadius:9,display:'grid',placeItems:'center',background:'var(--green)',color:'#062417'}}>B</span>BountyStacks</Link><nav style={{display:'flex',gap:22,flex:1,fontSize:14}}><Link href="/" className="muted">Browse</Link><Link href="/bounties/create" className="muted">Post a bounty</Link><Link href="/verify" className="muted">Verify</Link><Link href="/dashboard/contributor" className="muted">Dashboard</Link></nav><ThemeToggle/><ConnectButton/></div></header>}
+
+const links = [
+  { href: '/', label: 'Browse' },
+  { href: '/bounties/create', label: 'Post a bounty' },
+  { href: '/verify', label: 'Verify' },
+  { href: '/dashboard/contributor', label: 'Dashboard' },
+];
+
+export function Navbar() {
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  function closeMenu() {
+    setMenuOpen(false);
+  }
+
+  return (
+    <header className="site-header">
+      <div className="shell site-header-inner">
+        <Link href="/" className="brand" onClick={closeMenu}>
+          <span className="brand-mark">B</span>
+          <span>BountyStacks</span>
+        </Link>
+
+        <nav className="desktop-nav" aria-label="Main navigation">
+          {links.map((link) => (
+            <Link href={link.href} className="muted nav-link" key={link.href}>
+              {link.label}
+            </Link>
+          ))}
+        </nav>
+
+        <div className="header-actions">
+          <ThemeToggle />
+          <div className="desktop-wallet">
+            <ConnectButton />
+          </div>
+          <button
+            type="button"
+            className="mobile-menu-button btn btn-secondary"
+            aria-label={menuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+            aria-expanded={menuOpen}
+            aria-controls="mobile-navigation"
+            onClick={() => setMenuOpen((open) => !open)}
+          >
+            {menuOpen ? <X size={20} /> : <Menu size={20} />}
+          </button>
+        </div>
+      </div>
+
+      {menuOpen && (
+        <nav id="mobile-navigation" className="mobile-nav" aria-label="Mobile navigation">
+          {links.map((link) => (
+            <Link href={link.href} className="mobile-nav-link" key={link.href} onClick={closeMenu}>
+              {link.label}
+            </Link>
+          ))}
+          <div className="mobile-wallet">
+            <ConnectButton />
+          </div>
+        </nav>
+      )}
+    </header>
+  );
+}
