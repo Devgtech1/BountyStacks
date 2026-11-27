@@ -1,0 +1,91 @@
+name: Anchor program checks
+
+on:
+  pull_request:
+    paths:
+      - "bountystacks/Anchor.toml"
+      - "bountystacks/Cargo.toml"
+      - "bountystacks/rust-toolchain.toml"
+      - "bountystacks/programs/**"
+      - "bountystacks/tests/**"
+      - "bountystacks/package.json"
+      - "bountystacks/package-lock.json"
+      - ".github/workflows/anchor.yml"
+  push:
+    branches: [main]
+    paths:
+      - "bountystacks/Anchor.toml"
+      - "bountystacks/Cargo.toml"
+      - "bountystacks/rust-toolchain.toml"
+      - "bountystacks/programs/**"
+      - "bountystacks/tests/**"
+      - "bountystacks/package.json"
+      - "bountystacks/package-lock.json"
+      - ".github/workflows/anchor.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  anchor:
+    name: Build and test Solana program
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: bountystacks
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: 1.86.0
+          components: rustfmt, clippy
+
+      - name: Cache Rust dependencies
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: bountystacks -> target
+
+      - name: Install Solana CLI
+        run: |
+          sh -c "$(curl -sSfL https://release.anza.xyz/v2.1.0/install)"
+          echo "$HOME/.local/share/solana/install/active_release/bin" >> "$GITHUB_PATH"
+
+      - name: Install Anchor Version Manager
+        run: |
+          cargo install --git https://github.com/coral-xyz/anchor avm --locked
+          avm install 0.31.1
+          avm use 0.31.1
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: bountystacks/package-lock.json
+
+      - name: Install JavaScript dependencies
+        run: npm ci
+
+      - name: Check Rust formatting
+        run: cargo fmt --all -- --check
+
+      - name: Build Anchor program and generate IDL
+        run: anchor build
+
+      - name: Run Anchor tests
+        run: anchor test
+
+      - name: Upload generated IDL
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bountystacks-anchor-build
+          path: |
+            bountystacks/target/idl/bountystacks.json
+            bountystacks/target/types/bountystacks.ts
+          if-no-files-found: error
+          retention-days: 14
