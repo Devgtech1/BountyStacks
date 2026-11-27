@@ -146,6 +146,23 @@ export default async function Home() {
         </div>
       </section>
 
+      <section className="shell py-8 sm:py-10">
+        <div className="relative overflow-hidden rounded-[28px] p-7 sm:p-9" style={{ background: 'var(--green)', color: '#062417' }}>
+          <div className="pointer-events-none absolute -right-16 -top-24 h-64 w-64 rounded-full border-[32px] border-black/5" />
+          <div className="relative z-10 flex flex-col justify-between gap-6 md:flex-row md:items-center">
+            <div className="max-w-2xl">
+              <p className="text-xs font-black uppercase tracking-[.2em] opacity-70">Build something that counts</p>
+              <h2 className="mt-3 text-2xl font-black tracking-tight sm:text-3xl">Your skills can solve real problems.</h2>
+              <p className="mt-3 max-w-xl text-sm leading-7 opacity-80">Find a bounty, contribute, and earn SOL for work that gets accepted.</p>
+            </div>
+            <div className="flex shrink-0 flex-col gap-3 sm:flex-row">
+              <Link href="#bounties" className="btn border-transparent bg-[#062417] text-white">Browse bounties <ArrowRight size={16} /></Link>
+              <Link href="/bounties/create" className="btn border-black/15 bg-white/15 text-[#062417]">I’m a project creator</Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section className="border-y py-8" style={{ borderColor: 'var(--line)', background: 'var(--surface)' }}>
         <div className="shell grid gap-5 sm:grid-cols-3">
           {[
@@ -210,16 +227,6 @@ export default async function Home() {
             <Link href="/bounties/create" className="btn btn-primary mt-6">Create the first bounty <ArrowRight size={16} /></Link>
           </div>
         )}
-      </section>
-
-      <section className="shell pb-20">
-        <div className="relative overflow-hidden rounded-[28px] p-8 sm:p-12" style={{ background: 'var(--green)', color: '#062417' }}>
-          <div className="pointer-events-none absolute -right-16 -top-24 h-72 w-72 rounded-full border-[36px] border-black/5" />
-          <div className="relative z-10 flex flex-col justify-between gap-8 md:flex-row md:items-center">
-            <div className="max-w-xl"><p className="text-xs font-black uppercase tracking-[.2em] opacity-70">Build something that counts</p><h2 className="mt-4 text-3xl font-black tracking-tight sm:text-4xl">Your next contribution could be your best one yet.</h2><p className="mt-4 max-w-lg text-sm leading-7 opacity-80">Bring your skills. Find a real problem. Get rewarded for work that moves a project forward.</p></div>
-            <div className="flex shrink-0 flex-col gap-3 sm:flex-row"><Link href="#bounties" className="btn border-transparent bg-[#062417] text-white">Browse bounties <ArrowRight size={16} /></Link><Link href="/bounties/create" className="btn border-black/15 bg-white/15 text-[#062417]">I’m a project creator</Link></div>
-          </div>
-        </div>
       </section>
 
       <footer className="border-t py-8" style={{ borderColor: 'var(--line)' }}>
