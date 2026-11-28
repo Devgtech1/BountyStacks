@@ -105,6 +105,19 @@ production build.
 npx tsx scripts/e2e.ts     # create -> submit -> accept -> verify on devnet
 ```
 
+The smoke test signs in with both wallets (real signature auth), then runs the
+whole flow. Point it at the deployed app with:
+
+```bash
+APP_URL=https://bountystacks.vercel.app npx tsx scripts/e2e.ts
+```
+
+To leave an open bounty visible on the marketplace, seed one:
+
+```bash
+APP_URL=https://bountystacks.vercel.app npx tsx scripts/seed-demo.ts
+```
+
 The smoke test needs the web server running, a funded creator keypair at
 `.devnet/creator.json` (or `CREATOR_KEYPAIR=/path/to/keypair.json`) and the
 program id in `.env`.
