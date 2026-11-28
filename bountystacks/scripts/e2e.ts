@@ -86,7 +86,7 @@ async function ensureContributor(creator: Keypair): Promise<Keypair> {
 }
 
 async function main() {
-  const creator = loadKeypair(process.env.CREATOR_KEYPAIR || `${process.env.HOME}/.config/solana/id.json`);
+  const creator = loadKeypair(process.env.CREATOR_KEYPAIR || '.devnet/creator.json');
   const contributor = await ensureContributor(creator);
   const creatorWallet = creator.publicKey.toBase58();
   const contributorWallet = contributor.publicKey.toBase58();
