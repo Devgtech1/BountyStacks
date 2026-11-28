@@ -25,15 +25,6 @@ for (const line of readFileSync('.env', 'utf8').split('\n')) {
   if (match) process.env[match[1]] = match[2];
 }
 
-const {
-  acceptSubmissionInstruction,
-  createTaskInstruction,
-  submissionPda,
-  submitSolutionInstruction,
-  taskPda,
-} = await import('../src/lib/solana/instructions');
-const { requirementsMessage, sha256Bytes } = await import('../src/lib/solana/hash');
-
 const BASE = process.env.APP_URL || 'http://localhost:3000';
 const SECRET = process.env.SESSION_SECRET || '';
 const RPC = process.env.NEXT_PUBLIC_SOLANA_RPC_URL || 'https://api.devnet.solana.com';
@@ -86,6 +77,16 @@ async function ensureContributor(creator: Keypair): Promise<Keypair> {
 }
 
 async function main() {
+  // Imported lazily so the .env values above are loaded before the module reads them.
+  const {
+    acceptSubmissionInstruction,
+    createTaskInstruction,
+    submissionPda,
+    submitSolutionInstruction,
+    taskPda,
+  } = await import('../src/lib/solana/instructions');
+  const { requirementsMessage, sha256Bytes } = await import('../src/lib/solana/hash');
+
   const creator = loadKeypair(process.env.CREATOR_KEYPAIR || '.devnet/creator.json');
   const contributor = await ensureContributor(creator);
   const creatorWallet = creator.publicKey.toBase58();
