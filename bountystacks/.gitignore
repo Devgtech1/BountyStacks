@@ -11,4 +11,3 @@ target
 *.tsbuildinfo
 .devnet
 .vercel
-.env*
