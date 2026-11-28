@@ -8,4 +8,4 @@ out
 coverage
 target
 .anchor
-.DS_Store
+*.tsbuildinfo
