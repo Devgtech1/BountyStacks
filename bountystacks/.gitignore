@@ -10,3 +10,5 @@ target
 .anchor
 *.tsbuildinfo
 .devnet
+.vercel
+.env*

@@ -16,6 +16,20 @@ This is the exact procedure used to build, deploy and verify BountyStacks.
 The upgrade authority keypair lives **outside** the repository. Back it up
 securely; without it the program cannot be upgraded.
 
+## Web deployment record
+
+| Item | Value |
+| --- | --- |
+| Live site | https://bountystacks.vercel.app |
+| Vercel project | `gtech-innovation/bountystacks` (connected to the GitHub repo) |
+| Database | Supabase PostgreSQL 17, session pooler, `eu-west-1` |
+| Health check | `GET /api/health` → `{"ok":true,"database":"connected","network":"devnet"}` |
+
+Vercel environment variables (Production, Preview, Development):
+`DATABASE_URL`, `SESSION_SECRET`, `SUBMISSION_ENCRYPTION_KEY`,
+`ADMIN_WALLET_ADDRESSES`, `NEXT_PUBLIC_SOLANA_CLUSTER`,
+`NEXT_PUBLIC_SOLANA_RPC_URL`, `NEXT_PUBLIC_SOLANA_PROGRAM_ID`, `APP_URL`.
+
 ## 1. Toolchain
 
 Install on Linux or WSL2 (Windows does not have the Solana SBF toolchain):

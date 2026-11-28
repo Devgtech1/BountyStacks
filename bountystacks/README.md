@@ -2,7 +2,7 @@
 
 **Get work done. Get paid on-chain.** BountyStacks is a Solana-powered bounty marketplace. Creators publish a task with clear acceptance criteria and lock a SOL reward in escrow. Contributors compete by submitting solutions. The creator accepts one winner, the program pays that contributor, and a completion record can be checked independently on Solana.
 
-> Current repository status: implementation scaffold and first-pass Anchor program source. It has **not yet been compiled, tested, deployed, or connected to a live database** in this environment. Do not represent it as a completed or audited product until the checklist below passes.
+> **Status:** deployed to Solana **devnet** and live at https://bountystacks.vercel.app. The Anchor program is at `5n4acPr6EXFp1USWDxAtk3Fqiex9tsLa7yTK8wjHz4yg`, the app uses Supabase PostgreSQL, and the create → submit → accept → verify flow has been exercised end to end on devnet. It is **not audited**, does not yet implement on-chain disputes or platform fees, and must not be used with real-value SOL. See `docs/BUILD_STATUS.md` and `docs/DEPLOYMENT.md`.
 
 ## Product rules
 
