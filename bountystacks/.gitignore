@@ -9,3 +9,4 @@ coverage
 target
 .anchor
 *.tsbuildinfo
+.devnet

@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 use anchor_lang::system_program::{self, Transfer};
 
-declare_id!("Fg6PaFpoGXkYsidMpWxTWqkZ6W2BeZ7FEfcYkgMQhg3q");
+declare_id!("5n4acPr6EXFp1USWDxAtk3Fqiex9tsLa7yTK8wjHz4yg");
 
 pub const MIN_REWARD_LAMPORTS: u64 = 50_000_000; // 0.05 SOL placeholder; not a USD price check.
 
