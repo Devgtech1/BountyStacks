@@ -20,6 +20,8 @@ import { BountyCardData } from '@/components/bounty/bounty-card';
 import { BountyBrowser } from '@/components/bounty/bounty-browser';
 import { db } from '@/lib/db/prisma';
 
+export const dynamic = 'force-dynamic';
+
 async function getBounties(): Promise<BountyCardData[]> {
   try {
     const rows = await db.bounty.findMany({

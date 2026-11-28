@@ -3,9 +3,9 @@ seeds = false
 skip-lint = false
 
 [programs.localnet]
-bountystacks = "Fg6PaFpoGXkYsidMpWxTWqkZ6W2BeZ7FEfcYkgMQhg3q"
+bountystacks = "5n4acPr6EXFp1USWDxAtk3Fqiex9tsLa7yTK8wjHz4yg"
 [programs.devnet]
-bountystacks = "Fg6PaFpoGXkYsidMpWxTWqkZ6W2BeZ7FEfcYkgMQhg3q"
+bountystacks = "5n4acPr6EXFp1USWDxAtk3Fqiex9tsLa7yTK8wjHz4yg"
 
 [registry]
 url = "https://api.apr.dev"
